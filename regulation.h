@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+float regulation(int regul, float Tmp_Int, float Tmp_cgsn);
 
 float regulationTest(int regul, float consigne, float *tabT, int nT);
 
