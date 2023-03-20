@@ -5,39 +5,42 @@
 
 void visualisationC(float puissance_f) {
 
-  // Récupération des températures
+  if (access(".verrouData", 0) != 0) {
 
-  FILE *datas_read;
-  datas_read = fopen("data.txt", "r");
+    // Récupération des températures
 
-  char temp[5];
-  float exte;
-  float inte;
+    FILE *datas_read;
+    datas_read = fopen("data.txt", "r");
 
-  fgets(temp, 5, datas_read);
-  fscanf(datas_read,"%f" , &exte);
-  fscanf(datas_read, "%f",&inte);
-  
-  fclose(datas_read);
+    char temp[5];
+    float exte;
+    float inte;
 
-  // Réécriture du fichier
-  FILE *etat_chauffage;
-  etat_chauffage = fopen("data.txt", "w");
+    fgets(temp, 5, datas_read);
+    fscanf(datas_read, "%f", &exte);
+    fscanf(datas_read, "%f", &inte);
 
-  // Cas où le chauffage doit être allumé
-  if (puissance_f > 0) {
-    fprintf(etat_chauffage, "true");
+    fclose(datas_read);
+
+    // Réécriture du fichier
+    FILE *etat_chauffage;
+    etat_chauffage = fopen("data.txt", "w");
+
+    // Cas où le chauffage doit être allumé
+    if (puissance_f > 0) {
+      fprintf(etat_chauffage, "true");
+    }
+
+    // Cas où le chauffage doit être éteint
+    else {
+      fprintf(etat_chauffage, "false");
+    }
+
+    // Réécriture des températures dans le ficher.
+
+    fprintf(etat_chauffage, "\n%.2f", exte);
+    fprintf(etat_chauffage, "\n%.2f", inte);
+
+    fclose(etat_chauffage);
   }
-
-  // Cas où le chauffage doit être éteint
-  else {
-    fprintf(etat_chauffage, "false");
-  }
-
-  // Réécriture des températures dans le ficher.
-
-  fprintf(etat_chauffage, "\n%.2f", exte);
-  fprintf(etat_chauffage, "\n%.2f", inte);
-
-  fclose(etat_chauffage);
 }

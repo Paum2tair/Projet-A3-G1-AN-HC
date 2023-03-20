@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 float regulation(int regul, float Tmp_Int, float Tmp_cgsn) {
-  
+
   float puissance = 0.;
   switch (regul) {
   case 1:
@@ -11,15 +11,13 @@ float regulation(int regul, float Tmp_Int, float Tmp_cgsn) {
     if (Tmp_Int >= Tmp_cgsn) {
       puissance = 0;
     } else if (Tmp_Int < Tmp_cgsn) {
-      puissance = 0.5;
+      puissance = 50.0;
     }
     break;
   case 2:
     break;
-    
-    //PID
-    
-    
+
+    // PID
   }
   return puissance;
 }
