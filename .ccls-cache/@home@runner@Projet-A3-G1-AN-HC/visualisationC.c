@@ -1,7 +1,7 @@
 #include "visualisationC.h"
 #include <math.h>
 #include <stdio.h>
-#include <unistd.h>
+//#include <unistd.h>
 
 void visualisationC(float puissance_f) {
 
@@ -14,11 +14,11 @@ void visualisationC(float puissance_f) {
     FILE *datas_read;
     datas_read = fopen("data.txt", "r");
 
-    char temp[5];
+    char temp[6];
     float exte;
     float inte;
 
-    fgets(temp, 5, datas_read);
+    fgets(temp, 6, datas_read);
     fscanf(datas_read, "%f", &exte);
     fscanf(datas_read, "%f", &inte);
 
