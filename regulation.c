@@ -24,6 +24,16 @@ float regulation(int regul, float Tmp_Int, float Tmp_cgsn) {
 
 float regulationTest(int regul, float consigne, float *tabT, int nT) {
   float cmd = 100.0;
+  switch(regul){
+    case 1:
+      //TOR
+      for(int i = 0; i < nT; i++){
+        cmd = regulation(1, tabT[i], consigne);
+      }
+      break;
+    case 2:
+      break;
+  }
 
   return cmd;
 }

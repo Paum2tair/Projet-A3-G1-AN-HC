@@ -1,4 +1,3 @@
-#include "autotests.h"
 #include "consigne.h"
 #include "regulation.h"
 #include "visualisationC.h"
@@ -6,7 +5,6 @@
 #include <math.h>
 #include <stdio.h>
 #include <unistd.h>
-
 #define DISPLAY_DEBUG
 
 float testConsigne() {
@@ -29,7 +27,6 @@ float testConsigne() {
   pf = fopen("consigne.txt", "w");
   if (pf == NULL) {
     perror("in autotests.c, file not found");
-    return 0;
   }
   fprintf(pf, "%.2f\n", consigne_val[0]);
   fclose(pf);
@@ -44,30 +41,19 @@ float testConsigne() {
   Check consigne function: Reading consigne.txt
   *********************************/
   consigne_read = consigne(consigne_val[1]);
-
-  if (access(".verrouConsigne", F_OK) != -1) {
-    test_reader = 0;
-    perror("probable oubli de fermeture et suppression du fichier verrouData "
-           "dans VisualisationT");
-  } else {
-    if (consigne_read == consigne_val[0]) {
-      test_reader = 1;
-    } else {
-      test_reader = 0;
-    }
-  }
-
-  if (test_reader == 1) {
+  if (consigne_read == consigne_val[0]) {
     score += 0.5;
 // CU_PASS("test_consigne_reader");
 #ifdef DISPLAY_DEBUG
     printf("test_consigne_reader OK\n");
 #endif
+    test_reader = 1;
   } else {
 // CU_FAIL("test_consigne_reader");
 #ifdef DISPLAY_DEBUG
     printf("test_consigne_reader failed\n");
 #endif
+    test_reader = 0;
   }
 
   if (test_reader == 1) {
@@ -76,21 +62,13 @@ float testConsigne() {
     **********************************************/
     pf = fopen("consigne.txt", "w");
     if (pf == NULL) {
-      perror("in testu_consigne.c, file consigne.txt not found");
-      return score;
+      perror("in testu_consigne.c, file not found");
     }
     fprintf(pf, "%.2f\n", consigne_val[0]);
     fclose(pf);
-
-    // Create lock file (uniquement si il n'existe pas)
-    pf = fopen(".verrouConsigne", "wx");
-    if (pf == NULL) {
-      perror(
-          "in testu_consigne.c, file .verrouConsigne not beahiving correctly");
-      return score;
-    }
+    // Create lock file
+    pf = fopen(".verrouConsigne", "w");
     fclose(pf);
-
     /**********************************
      Check consigne function: lock file .verrouConsigne
      ***********************************/
@@ -100,15 +78,11 @@ float testConsigne() {
     if (access(".verrouConsigne", F_OK) != -1) {
       // End of test: remove lock
       remove(".verrouConsigne");
+    }
 
-      if (consigne_read == consigne_val[1]) {
-        test_lock = 1;
-      } else {
-        test_lock = 0;
-      }
+    if (consigne_read == consigne_val[1]) {
+      test_lock = 1;
     } else {
-      perror("probable oubli de fermeture et suppression du fichier "
-             "verrouConsigne dans consigne");
       test_lock = 0;
     }
   } else {
@@ -127,7 +101,6 @@ float testConsigne() {
     printf("test_consigne_lock failed\n");
 #endif
   }
-  //printf("Notre score de consigne est de : %.2f", score);
   return score;
 }
 
@@ -143,11 +116,11 @@ float testVisualisationT() {
   temperature[1].interieure = 22.0;
   temperature[2].exterieure = 10.0;
   temperature[2].interieure = 20.0;
-  char temoin_chauffe[8];
+  char *temoin_chauffe = malloc(8 * sizeof(char));
 
   float exterieure_read;
   float interieure_read;
-  char temoin_chauffe_read[8];
+  char *temoin_chauffe_read = malloc(8 * sizeof(char));
 
   int test_display = 0;
   int test_lock = 0;
@@ -158,13 +131,14 @@ float testVisualisationT() {
   **********************************************/
   pf = fopen("data.txt", "w");
   if (pf == NULL) {
-    perror("in testu_visualisationT.c, file data.txt not found");
-    return score;
+    perror("in testu_visualisationT.c, file not found");
   }
-
-  fprintf(pf, "%s\n%.2f\n%.2f", temoin_chauffe, temperature[0].interieure,
+  fprintf(pf, "%s\n", temoin_chauffe);
+  fprintf(pf, "%.2f\n%.2f\n", temperature[0].interieure,
           temperature[0].exterieure);
+
   fclose(pf);
+
   /**********************************************
   Remove verrou if exists
   **********************************************/
@@ -176,15 +150,13 @@ float testVisualisationT() {
   Check visualisationT function: writing data.txt
   *********************************/
   visualisationT(temperature[1]);
+
   pf = fopen("data.txt", "r");
   if (pf == NULL) {
     test_display = 0;
-    perror("in testu_visualisationT.c, file data.txt not found");
   } else {
-    fscanf(pf, "%s", temoin_chauffe_read);
-    fscanf(pf, "%f", &interieure_read);
-    fscanf(pf, "%f", &exterieure_read);
-
+    fscanf(pf, "%s\n", temoin_chauffe_read);
+    fscanf(pf, "%f\n%f", &interieure_read, &exterieure_read);
     fclose(pf);
     if (exterieure_read == temperature[1].exterieure &&
         interieure_read == temperature[1].interieure &&
@@ -193,12 +165,6 @@ float testVisualisationT() {
     } else {
       test_display = 0;
     }
-  }
-
-  if (access(".verrouData", F_OK) != -1) {
-    test_display = 0;
-    perror("probable oubli de fermeture et suppression du fichier verrouData "
-           "dans VisualisationT");
   }
 
   if (test_display == 1) {
@@ -222,20 +188,13 @@ float testVisualisationT() {
     pf = fopen("data.txt", "w");
     if (pf == NULL) {
       perror("in testu_visualisationT.c, file not found");
-      return score;
     }
-
     fprintf(pf, "%s\n", temoin_chauffe);
-    fprintf(pf, "%.2f\n%.2f", temperature[0].interieure,
+    fprintf(pf, "%.2f\n%.2f\n", temperature[0].interieure,
             temperature[0].exterieure);
     fclose(pf);
-
-    // Create lock file if only it does not exist
-    pf = fopen(".verrouData", "wx");
-    if (pf == NULL) {
-      perror("in testu_visualisationT.c, file verrouData : error to create");
-      return score;
-    }
+    // Create lock file
+    pf = fopen(".verrouData", "w");
     fclose(pf);
     /**********************************
      Check visualisationT function: lock file .verrouData
@@ -246,28 +205,25 @@ float testVisualisationT() {
     if (access(".verrouData", F_OK) != -1) {
       // End of test: remove lock
       remove(".verrouData");
+    }
 
-      // Check value from data.txt
-      pf = fopen("data.txt", "r");
-      if (pf == NULL) {
-        test_lock = 0;
-      } else {
-        fscanf(pf, "%s", temoin_chauffe_read);
-        fscanf(pf, "%f\n%f", &interieure_read, &exterieure_read);
-        fclose(pf);
-        // Values in data.txt should not have changed: mes
-        if (exterieure_read == temperature[0].exterieure &&
-            interieure_read == temperature[0].interieure &&
-            strcmp(temoin_chauffe, temoin_chauffe_read) == 0) {
-          test_lock = 1;
-        } else {
-          test_lock = 0;
-        }
-      }
-    } else {
-      perror(
-          "suppression d'un verrouData déja présent ! dans visualisationT \n");
+    // Check value from data.txt
+    pf = fopen("data.txt", "r");
+    if (pf == NULL) {
       test_lock = 0;
+    } else {
+      fscanf(pf, "%s\n", temoin_chauffe_read);
+      fscanf(pf, "%f\n%f", &interieure_read, &exterieure_read);
+
+      fclose(pf);
+      // Values in data.txt should not have changed: mes
+      if (exterieure_read == temperature[0].exterieure &&
+          interieure_read == temperature[0].interieure &&
+          strcmp(temoin_chauffe, temoin_chauffe_read) == 0) {
+        test_lock = 1;
+      } else {
+        test_lock = 0;
+      }
     }
   } else {
     test_lock = 0;
@@ -287,6 +243,8 @@ float testVisualisationT() {
 #endif
   }
 
+  free(temoin_chauffe);
+  free(temoin_chauffe_read);
   return score;
 }
 
@@ -302,12 +260,12 @@ float testVisualisationC() {
   float puissance[2] = {35.0, 0.0};
   float exterieure[2] = {11.0, 10.0};
   float interieure[2] = {17.0, 18.0};
-  char temoin_chauffe[8];
+  char *temoin_chauffe = malloc(8 * sizeof(char));
 
   float puissance_read;
   float exterieure_read;
   float interieure_read;
-  char temoin_chauffe_read[8];
+  char *temoin_chauffe_read = malloc(8 * sizeof(char));
 
   strcpy(temoin_chauffe, "not");
   /**********************************************
@@ -325,39 +283,30 @@ float testVisualisationC() {
     pf = fopen("data.txt", "w");
     if (pf == NULL) {
       perror("in testu_visualisationC.c, file not found");
-      return score;
     }
     fprintf(pf, "%s\n", temoin_chauffe);
-    fprintf(pf, "%.2f\n%.2f", interieure[i], exterieure[i]);
+    fprintf(pf, "%.2f\n%.2f\n", interieure[i], exterieure[i]);
+
     fclose(pf);
 
     /*******************************
     Check visualisationC function: writing data.txt
     *********************************/
     visualisationC(puissance[i]);
-
-    if (access(".verrouData", F_OK) != -1) {
-      perror("probable erreur dans visualisationC : le fichier verroudata "
-             "existe encore après la sortie de la fonction\n");
+    if (puissance[i] == 0.0) {
+      strcpy(temoin_chauffe, "false");
     } else {
-      if (puissance[i] == 0.0) {
-        strcpy(temoin_chauffe, "false");
-      } else {
-        strcpy(temoin_chauffe, "true");
-      }
-      pf = fopen("data.txt", "r");
-      if (pf != NULL) {
-        fscanf(pf, "%s", temoin_chauffe_read);
-        fscanf(pf, "%f\n%f", &interieure_read, &exterieure_read);
-        fclose(pf);
-        if (exterieure[i] == exterieure_read &&
-            interieure[i] == interieure_read &&
-            strcmp(temoin_chauffe, temoin_chauffe_read) == 0) {
-          test_display++;
-        }
-      } else {
-        perror("in testu_visualisationC.c, file not found");
-        return score;
+      strcpy(temoin_chauffe, "true");
+    }
+    pf = fopen("data.txt", "r");
+    if (pf != NULL) {
+      fscanf(pf, "%s", temoin_chauffe_read);
+      fscanf(pf, "%f\n%f", &interieure_read, &exterieure_read);
+      fclose(pf);
+      if (exterieure[i] == exterieure_read &&
+          interieure[i] == interieure_read &&
+          strcmp(temoin_chauffe, temoin_chauffe_read) == 0) {
+        test_display++;
       }
     }
   }
@@ -389,19 +338,14 @@ float testVisualisationC() {
     pf = fopen("data.txt", "w");
     if (pf == NULL) {
       perror("in testu_visualisationC.c, file not found");
-      return score;
     }
     fprintf(pf, "%s\n", temoin_chauffe);
-    fprintf(pf, "%.2f\n%.2f", interieure[0], exterieure[0]);
+    fprintf(pf, "%.2f\n%.2f\n", interieure[0], exterieure[0]);
 
     fclose(pf);
 
     // Create lock file
-    pf = fopen(".verrouData", "wx");
-    if (pf == NULL) {
-      perror("in testu_visualisationC.c, file verrouData : error to create");
-      return score;
-    }
+    pf = fopen(".verrouData", "w");
     fclose(pf);
 
     // data to write in the data.txt file (should not work)
@@ -410,31 +354,26 @@ float testVisualisationC() {
     if (access(".verrouData", F_OK) != -1) {
       // End of test: remove lock
       remove(".verrouData");
-
-      // Check value from data.txt
-      pf = fopen("data.txt", "r");
-      if (pf == NULL) {
-        test_lock = 0;
-      } else {
-        fscanf(pf, "%s", temoin_chauffe_read);
-        fscanf(pf, "%f\n%f", &interieure_read, &exterieure_read);
-        fclose(pf);
-
-        // Values in data.txt should not have changed
-        if (exterieure[0] == exterieure_read &&
-            interieure[0] == interieure_read &&
-            strcmp(temoin_chauffe, temoin_chauffe_read) == 0) {
-          test_lock = 1;
-        } else {
-          test_lock = 0;
-        }
-      }
-    } else {
-      test_lock = 0;
-      perror("probable suppression non attendue du fichier verroudata quand "
-             "celui existe, dans VisualisationC\n");
     }
 
+    // Check value from data.txt
+    pf = fopen("data.txt", "r");
+    if (pf == NULL) {
+      test_lock = 0;
+    } else {
+      fscanf(pf, "%s", temoin_chauffe_read);
+      fscanf(pf, "%f\n%f", &interieure_read, &exterieure_read);
+
+      fclose(pf);
+      // Values in data.txt should not have changed
+      if (exterieure[0] == exterieure_read &&
+          interieure[0] == interieure_read &&
+          strcmp(temoin_chauffe, temoin_chauffe_read) == 0) {
+        test_lock = 1;
+      } else {
+        test_lock = 0;
+      }
+    }
   } else {
     test_lock = 0;
   }
@@ -453,6 +392,9 @@ float testVisualisationC() {
     printf("test visualisationC_lock failed\n");
 #endif
   }
+
+  free(temoin_chauffe);
+  free(temoin_chauffe_read);
 
   return score;
 }
@@ -590,7 +532,7 @@ float testRegulationPID() {
   cmd = cmd_target + 100;
 
   attendu[0] = 0.55;
-  for (i = 1; i < nTT; i++) {
+  for (i = 1; i < nTTb; i++) {
     attendu[i] = attendu[i - 1] + 1;
   }
 

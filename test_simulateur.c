@@ -6,6 +6,8 @@
 #include "simulateur.h"
 #include "visualisationC.h"
 #include "visualisationT.h"
+#include "releve.h"
+#include "autotests.h"
 
 int main() {
   /*
@@ -47,6 +49,7 @@ int main() {
   score1 = testVisualisationT();
   score2 = testConsigne();
   score3 = testVisualisationC();
+
   score4 = testRegulationTOR();
   score5 = testRegulationPID();
   printf("----- Auto tests results: -----\n");

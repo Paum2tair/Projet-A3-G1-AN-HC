@@ -5,7 +5,9 @@
 
 void visualisationC(float puissance_f) {
 
-  if (access(".verrouData", 0) != 0) {
+  FILE *verrou;
+  verrou = fopen(".verrouData", "wx");
+  if (verrou != NULL) {
 
     // Récupération des températures
 
@@ -42,5 +44,7 @@ void visualisationC(float puissance_f) {
     fprintf(etat_chauffage, "\n%.2f", inte);
 
     fclose(etat_chauffage);
+    fclose(verrou);
+    remove(".verrouData");
   }
 }
