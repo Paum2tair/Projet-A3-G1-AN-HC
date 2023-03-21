@@ -2,7 +2,9 @@
 
 void visualisationT(temp_t myTemp) {
 
-  if (access(".verrouData", 0) != 0) {
+  FILE *verrou;
+  verrou = fopen(".verrouData", "wx");
+  if ( verrou == NULL ) {
 
     // lecture de la première ligne du fichier
     FILE *datas_read;
@@ -23,5 +25,7 @@ void visualisationT(temp_t myTemp) {
     fprintf(datas_write, "\n%.2f", myTemp.interieure);
 
     fclose(datas_write);
+    fclose
+    remove(".verrouData");
   }
 }
