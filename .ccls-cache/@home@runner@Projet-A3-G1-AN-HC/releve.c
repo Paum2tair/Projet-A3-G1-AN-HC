@@ -1,3 +1,9 @@
 #include "releve.h"
 
-temp_t releve() {}
+temp_t releve() {
+
+//Ouverture du device
+
+
+  
+}
