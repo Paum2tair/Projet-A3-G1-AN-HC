@@ -492,7 +492,7 @@ float testRegulationPID() {
 
   for (i = 0; i < nTT; i++) {
     if (tabTT[i] != tabTTtemoin[i]) {
-      perror("le tableau d'entrée est modifié alors qu'il ne faut pas dans le "
+      printf("le tableau d'entrée est modifié alors qu'il ne faut pas dans le "
              "test de regulation !\n");
       return 0;
     }
@@ -502,7 +502,7 @@ float testRegulationPID() {
 
   for (i = 0; i < nTT; i++) {
     if (tabTT[i] != tabTTtemoin[i]) {
-      perror("le tableau d'entrée est modifié alors qu'il ne faut pas dans le "
+      printf("le tableau d'entrée est modifié alors qu'il ne faut pas dans le "
              "test de regulation !\n");
       return 0;
     }
@@ -536,14 +536,14 @@ float testRegulationPID() {
     attendu[i] = attendu[i - 1] + 1;
   }
 
-  // printf("tabTT[0] = %f commandea = %f \n",tabTT[0],cmd);
+   printf("tabTT[0] = %f commandea = %f \n",tabTT[0],cmd);
 
   for (i = 0; i < nTTb; i++) {
     cmd = regulationTest(2, 20.5, tabTT, i + 1);
     if (cmd != attendu[i]) {
       faux_comparaison_attendu_a = 1;
     }
-     printf("commande = %f attendu = %f\n",cmd, attendu[i]);
+    printf("commande = %f attendu = %f\n", cmd, attendu[i]);
   }
 
   if (faux_comparaison_attendu_a == 1) {
